@@ -3,7 +3,7 @@
 void f_push(stack_t **stack, unsigned int line_number)
 {
     int n, i = 0;
-    stack_t *new_node;
+    stack_t *new_node, *tail;
 
     if (!op_arg)
     {
@@ -33,11 +33,31 @@ void f_push(stack_t **stack, unsigned int line_number)
         exit(EXIT_FAILURE);
     }
     new_node->n = n;
+    new_node->next = NULL;
     new_node->prev = NULL;
-    new_node->next = *stack;
-    if (*stack)
-        (*stack)->prev = new_node;
-    *stack = new_node;
+
+    if (data_mode == 0) /* Stack (LIFO) Mode */
+    {
+        new_node->next = *stack;
+        if (*stack)
+            (*stack)->prev = new_node;
+        *stack = new_node;
+    }
+    else /* Queue (FIFO) Mode */
+    {
+        if (!*stack)
+        {
+            *stack = new_node;
+        }
+        else
+        {
+            tail = *stack;
+            while (tail->next)
+                tail = tail->next;
+            tail->next = new_node;
+            new_node->prev = tail;
+        }
+    }
 }
 
 void f_pall(stack_t **stack, unsigned int line_number)
@@ -172,6 +192,98 @@ void f_mod(stack_t **stack, unsigned int line_number)
 
     (*stack)->next->n %= (*stack)->n;
     f_pop(stack, line_number);
+}
+
+void f_pchar(stack_t **stack, unsigned int line_number)
+{
+    if (!stack || !*stack)
+    {
+        fprintf(stderr, "L%u: can't pchar, stack empty\n", line_number);
+        exit(EXIT_FAILURE);
+    }
+
+    if ((*stack)->n < 0 || (*stack)->n > 127)
+    {
+        fprintf(stderr, "L%u: can't pchar, value out of range\n", line_number);
+        exit(EXIT_FAILURE);
+    }
+
+    printf("%c\n", (*stack)->n);
+}
+
+void f_pstr(stack_t **stack, unsigned int line_number)
+{
+    stack_t *current;
+    (void)line_number;
+
+    if (stack && *stack)
+    {
+        current = *stack;
+        while (current)
+        {
+            if (current->n <= 0 || current->n > 127)
+                break;
+            printf("%c", current->n);
+            current = current->next;
+        }
+    }
+    printf("\n");
+}
+
+void f_rotl(stack_t **stack, unsigned int line_number)
+{
+    stack_t *top, *last;
+    (void)line_number;
+
+    if (!stack || !*stack || !(*stack)->next)
+        return;
+
+    top = *stack;
+    last = top;
+
+    while (last->next)
+        last = last->next;
+
+    *stack = top->next;
+    (*stack)->prev = NULL;
+
+    last->next = top;
+    top->prev = last;
+    top->next = NULL;
+}
+
+void f_rotr(stack_t **stack, unsigned int line_number)
+{
+    stack_t *last;
+    (void)line_number;
+
+    if (!stack || !*stack || !(*stack)->next)
+        return;
+
+    last = *stack;
+
+    while (last->next)
+        last = last->next;
+
+    last->prev->next = NULL;
+    last->next = *stack;
+    last->prev = NULL;
+    (*stack)->prev = last;
+    *stack = last;
+}
+
+void f_stack(stack_t **stack, unsigned int line_number)
+{
+    (void)stack;
+    (void)line_number;
+    data_mode = 0;
+}
+
+void f_queue(stack_t **stack, unsigned int line_number)
+{
+    (void)stack;
+    (void)line_number;
+    data_mode = 1;
 }
 
 void free_stack(stack_t *head)

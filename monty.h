@@ -22,6 +22,7 @@ typedef struct instruction_s
 } instruction_t;
 
 extern char *op_arg;
+extern int data_mode; /* 0 = Stack (LIFO), 1 = Queue (FIFO) */
 
 void execute_opcode(char *line, stack_t **stack, unsigned int line_number);
 void free_stack(stack_t *head);
@@ -37,5 +38,11 @@ void f_div(stack_t **stack, unsigned int line_number);
 void f_mul(stack_t **stack, unsigned int line_number);
 void f_sub(stack_t **stack, unsigned int line_number);
 void f_mod(stack_t **stack, unsigned int line_number);
+void f_pchar(stack_t **stack, unsigned int line_number);
+void f_pstr(stack_t **stack, unsigned int line_number);
+void f_rotl(stack_t **stack, unsigned int line_number);
+void f_rotr(stack_t **stack, unsigned int line_number);
+void f_stack(stack_t **stack, unsigned int line_number);
+void f_queue(stack_t **stack, unsigned int line_number);
 
 #endif /* MONTY_H */

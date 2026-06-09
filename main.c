@@ -2,6 +2,7 @@
 #include "monty.h"
 
 char *op_arg = NULL;
+int data_mode = 0; /* Default behavior is Stack (0) */
 
 int main(int argc, char **argv)
 {
